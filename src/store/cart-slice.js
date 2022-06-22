@@ -1,41 +1,37 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  isCartVisible: false,
-  cartItems: [
-    // {
-    //   id: 1,
-    //   product_name: "Test Item",
-    //   quantity: 4,
-    //   total: 18,
-    //   price: 6.5,
-    //   promo_code: "Super-duper-save001",
-    // },
-  ],
+  cartItems: [],
   totalQuantity: 0,
+  isCartChanged: false,
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState: initialState,
   reducers: {
-    changeIsCartVisible(state) {
-      state.isCartVisible = !state.isCartVisible;
+    replaceCart(state, action) {
+      state.totalQuantity = action.payload.totalQuantity;
+      state.cartItems = action.payload.cartItems;
     },
+
     addToCart(state, action) {
+      state.totalQuantity++;
+      state.isCartChanged = true;
       const existingItemIndex = state.cartItems.findIndex(
         (item) => item.id === action.payload.id
       );
       const existingItem = state.cartItems[existingItemIndex];
       if (existingItem) {
-        existingItem.quantity = existingItem.quantity + 1;
-        state.totalQuantity = state.totalQuantity + 1;
+        existingItem.quantity++;
       } else {
         state.cartItems = state.cartItems.concat(action.payload);
-        state.totalQuantity = state.totalQuantity + 1;
       }
     },
+
     removeFromCart(state, action) {
+      state.totalQuantity--;
+      state.isCartChanged = true;
       const existingItemIndex = state.cartItems.findIndex(
         (item) => item.id === action.payload.id
       );
@@ -44,10 +40,8 @@ const cartSlice = createSlice({
         state.cartItems = state.cartItems.filter(
           (item) => item.id !== action.payload.id
         );
-        state.totalQuantity = state.totalQuantity - 1;
       } else {
-        existingItem.quantity = existingItem.quantity - 1;
-        state.totalQuantity = state.totalQuantity - 1;
+        existingItem.quantity--;
       }
     },
   },
